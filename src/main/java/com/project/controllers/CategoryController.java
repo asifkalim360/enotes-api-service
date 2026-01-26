@@ -79,41 +79,58 @@ public class CategoryController {
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getCategoryDetailById(@PathVariable Integer id) throws Exception
 	{
-//		try
+//		CategoryDto categoryDto = categoryService.getCategoryById(id);
+//		if(ObjectUtils.isEmpty(categoryDto)) 
 //		{
-//			CategoryDto categoryDtoById = categoryService.getCategoryById(id); 
-//			if(ObjectUtils.isEmpty(categoryDtoById)) 
-//			{
-//				return new ResponseEntity<>("category Not found with ID " + id, HttpStatus.NOT_FOUND);
-//			}
-//			return new ResponseEntity<>(categoryDtoById, HttpStatus.OK);
+//			return new ResponseEntity<>("Category not found with ID: " + id, HttpStatus.NOT_FOUND);
 //		}
-//		catch(ResourceNotFoundException e)
-//		{
-//			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-//		}
-//		catch (Exception e) 
-//		{
-//			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-//		}
+//		return new ResponseEntity<>(categoryDto, HttpStatus.OK);
+//---------------------------------------------------------------------------------------------------------		
 		
-		CategoryDto categoryDtoById = categoryService.getCategoryById(id); 
-		if(ObjectUtils.isEmpty(categoryDtoById)) 
+		try
 		{
-			return new ResponseEntity<>("Internal Server Error", HttpStatus.NOT_FOUND);
+			CategoryDto categoryDtoById = categoryService.getCategoryById(id); 
+			if(ObjectUtils.isEmpty(categoryDtoById)) 
+			{
+				return new ResponseEntity<>("category Not found with ID: " + id, HttpStatus.NOT_FOUND);
+			}
+			return new ResponseEntity<>(categoryDtoById, HttpStatus.OK);
 		}
-		return new ResponseEntity<>(categoryDtoById, HttpStatus.OK);
+		catch(ResourceNotFoundException e)
+		{
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
+		catch (Exception e) 
+		{
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+//---------------------------------------------------------------------------------------------------------
+		
+//		CategoryDto categoryDtoById = categoryService.getCategoryById(id); 
+//		if(ObjectUtils.isEmpty(categoryDtoById)) 
+//		{
+//			return new ResponseEntity<>("Internal Server Error", HttpStatus.NOT_FOUND);
+//		}
+//		return new ResponseEntity<>(categoryDtoById, HttpStatus.OK);
 		
 		
 	}
 	
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteCategoryById(@PathVariable Integer id){
-		Boolean deleteById = categoryService.deleteCategoryById(id); 
-		if(deleteById) {
-			return new ResponseEntity<>("Category Deleted Successfully for this: " + id, HttpStatus.OK);
+		Boolean deleteCategoryById = categoryService.deleteCategoryById(id);
+		if(ObjectUtils.isEmpty(deleteCategoryById))
+		{
+			return new ResponseEntity<>("Category Not Deleted", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		return new ResponseEntity<>("Category Not Deleted", HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<>("Category Partially Deleted Successfully id: "+id, HttpStatus.OK);
+		
+		
+//		Boolean deleteById = categoryService.deleteCategoryById(id); 
+//		if(deleteById) {
+//			return new ResponseEntity<>("Category Deleted Successfully for this: " + id, HttpStatus.OK);
+//		}
+//		return new ResponseEntity<>("Category Not Deleted", HttpStatus.INTERNAL_SERVER_ERROR);
+//	}
 	}
-	
 }

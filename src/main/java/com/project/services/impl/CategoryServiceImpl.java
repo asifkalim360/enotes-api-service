@@ -26,6 +26,7 @@ public class CategoryServiceImpl implements CategoryService {
 	@Autowired
 	private ModelMapper mapper;
 	
+	// CREATE CATEGORY:	
 	@Override
 	public Boolean saveCategory(CategoryDto categoryDto) {
 		
@@ -67,14 +68,16 @@ public class CategoryServiceImpl implements CategoryService {
 			category.setUpdatedOn(new Date());
 		}
 	}
-
+	
+	// GET ALL CATEGORY:
 	@Override
 	public List<CategoryDto> getAllCategory() {
 		List<Category> categories = categoryRepository.findAllByIsDeletedFalse();
 		List<CategoryDto> categoryDtoList = categories.stream().map(cat-> mapper.map(cat, CategoryDto.class)).toList();
 ;		return categoryDtoList;
 	}
-
+	
+	// GET ACTIVE CATEGORY:
 	@Override
 	public List<CategoryResponse> getActiveCategory() {
 		List<Category> categories = categoryRepository.findByIsActiveAndIsDeletedFalse(true); 
@@ -85,10 +88,21 @@ public class CategoryServiceImpl implements CategoryService {
 		return categoryResponseList;
 	}
 
+	// GET CATEGORY	BY ID:
 	@Override
 	public CategoryDto getCategoryById(Integer id) throws Exception {
+		
+//		Optional<Category> findByCategory = categoryRepository.findById(id);
+//		if(findByCategory.isPresent())
+//		{
+//			Category category = findByCategory.get(); 
+//			return mapper.map(category, CategoryDto.class);
+//		}
+//		return null;
+//------------------------------------------------------------------------------------------------------
+		
 		Category category = categoryRepository.findByIdAndIsDeletedFalse(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Category Not Found with id" + id));
+				.orElseThrow(() -> new ResourceNotFoundException("Category Not Found with id: " + id));
 		if(!ObjectUtils.isEmpty(category)) {
 			category.getName().toUpperCase();
 			return mapper.map(category, CategoryDto.class);
@@ -96,6 +110,7 @@ public class CategoryServiceImpl implements CategoryService {
 		return null;
 	}
 
+	// DETELE CATEGORY BY ID:
 	@Override
 	public Boolean deleteCategoryById(Integer id) {
 		Optional<Category> findByIdCategory = categoryRepository.findById(id);
