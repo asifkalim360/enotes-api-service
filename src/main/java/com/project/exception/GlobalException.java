@@ -12,24 +12,30 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @ControllerAdvice
 public class GlobalException {
 	
-//	@ExceptionHandler(Exception.class)
-//	public ResponseEntity<?> handleException(Exception e)
-//	{
-//		return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-//	}
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<?> handleException(Exception e)
+	{
+		log.error("GlobalException :: handleException :: ", e.getMessage());
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 	
 	@ExceptionHandler(NullPointerException.class)
 	public ResponseEntity<?> handleNullPointerException(Exception e)
 	{
+		log.error("GlobalException :: handleNullPointerException :: ", e.getMessage());
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}	
 	
 	@ExceptionHandler(ResourceNotFoundException.class)
 	public ResponseEntity<?> handleResourceNotFoundException(Exception e) 
 	{
+		log.error("GlobalException :: handleResourceNotFoundException :: ", e.getMessage());
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 	}
 	
@@ -43,7 +49,8 @@ public class GlobalException {
 			String msg = err.getDefaultMessage(); 
 			String field = ((FieldError) (err)).getField(); 
 			error.put(field, msg);
-		});		
+		});	
+		log.error("GlobalException :: handleMethodArgumentNotValidException :: ", e.getMessage());
 		return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
 	}
 	
