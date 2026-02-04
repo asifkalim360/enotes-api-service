@@ -18,12 +18,12 @@ import lombok.extern.slf4j.Slf4j;
 @ControllerAdvice
 public class GlobalException {
 	
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<?> handleException(Exception e)
-	{
-		log.error("GlobalException :: handleException :: ", e.getMessage());
-		return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-	}
+//	@ExceptionHandler(Exception.class)
+//	public ResponseEntity<?> handleException(Exception e)
+//	{
+//		log.error("GlobalException :: handleException :: ", e.getMessage());
+//		return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//	}
 	
 	@ExceptionHandler(NullPointerException.class)
 	public ResponseEntity<?> handleNullPointerException(Exception e)
