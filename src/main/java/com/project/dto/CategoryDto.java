@@ -19,7 +19,7 @@ public class CategoryDto {
 	
 	private Integer id; 
 	
-//	@NotBlank 
+	@NotBlank(message = "Category name is required")
 //	@Min(value=2)
 //	@Max(value=110)
 	private String name;
@@ -40,3 +40,12 @@ public class CategoryDto {
 	
 	private Date updatedOn;
 }
+
+
+/**
+DTO sirf data carry karta hai
+
+@NotBlank → validation
+
+DTO me ApiResponse kabhi nahi daalna chahye.
+*/

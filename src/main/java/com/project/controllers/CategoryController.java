@@ -1,7 +1,7 @@
 package com.project.controllers;
 
 
-
+import org.springframework.http.MediaType;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +21,7 @@ import com.project.dto.CategoryDto;
 import com.project.dto.CategoryResponse;
 import com.project.entity.Category;
 import com.project.exception.ResourceNotFoundException;
+import com.project.response.ApiResponse;
 import com.project.services.CategoryService;
 
 import jakarta.validation.Valid;
@@ -28,112 +29,89 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController 
-@RequestMapping("/api/v1/category")
+@RequestMapping(
+		value = "/api/v1/category",
+	    produces = MediaType.APPLICATION_JSON_VALUE
+)
 public class CategoryController {
 	
-	@Autowired
-	private CategoryService categoryService;
+	private final CategoryService categoryService;
+
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
+    }
 	
-	@PostMapping("/save")
-	public ResponseEntity<?> saveCategory(@Valid @RequestBody CategoryDto categoryDto)
+
+    @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<ApiResponse<CategoryDto>> saveCategory(@Valid @RequestBody CategoryDto categoryDto)
 	{
-		Boolean saveCategory = categoryService.saveCategory(categoryDto);
-		if(saveCategory)
-		{
-			return new ResponseEntity<>("Data Saved Successfully", HttpStatus.CREATED);
-		}
-		else
-		{
-			return new ResponseEntity<>("Something Went Wrong | Data do't save", HttpStatus.INTERNAL_SERVER_ERROR);
-		}		
+		CategoryDto savedDto = categoryService.saveCategory(categoryDto);
+		
+		ApiResponse<CategoryDto> response =
+	            new ApiResponse<>(true, "Data Saved Successfully", savedDto);
+
+		return ResponseEntity
+		        .status(HttpStatus.CREATED)
+		        .contentType(MediaType.APPLICATION_JSON)
+		        .body(response);
 	}
 	
 	@GetMapping("/all")
-	public ResponseEntity<?> getAllCategory()
+	public ResponseEntity<ApiResponse<List<CategoryDto>>> getAllCategory()
 	{
 		List<CategoryDto> allCategory = categoryService.getAllCategory();
+
+	    ApiResponse<List<CategoryDto>> response =
+	            new ApiResponse<>(true, "Data fetched successfully", allCategory);
+
+//	    return new ResponseEntity<>(response, HttpStatus.OK);
+	    return ResponseEntity
+		        .status(HttpStatus.OK)
+		        .contentType(MediaType.APPLICATION_JSON)
+		        .body(response);
 		
-		if(CollectionUtils.isEmpty(allCategory))
-		{
-			return ResponseEntity.noContent().build();
-		}
-		else
-		{
-			return new ResponseEntity<>(allCategory, HttpStatus.OK);
-		}		
 	}
 	
 	@GetMapping("/active")
 	public ResponseEntity<?> getActiveCategory()
-	{
-		List<CategoryResponse> allActiveCategory = categoryService.getActiveCategory();
-		
-		if(CollectionUtils.isEmpty(allActiveCategory))
-		{
-			return ResponseEntity.noContent().build();
-		}
-		else
-		{
-			return new ResponseEntity<>(allActiveCategory, HttpStatus.OK);
-		}		
+	{		
+		List<CategoryDto> allActiveCategory = categoryService.getAllCategory();
+
+	    ApiResponse<List<CategoryDto>> response =
+	            new ApiResponse<>(true, "Data fetched successfully", allActiveCategory);
+
+//	    return new ResponseEntity<>(response, HttpStatus.OK);
+	    return ResponseEntity
+		        .status(HttpStatus.OK)
+		        .contentType(MediaType.APPLICATION_JSON)
+		        .body(response);
 	}
-	
+		
 	@GetMapping("/{id}")
-	public ResponseEntity<?> getCategoryDetailById(@PathVariable Integer id) throws Exception
+	public ResponseEntity<ApiResponse<CategoryDto>> getCategoryDetailById(@PathVariable Integer id) throws Exception
 	{
-//		CategoryDto categoryDto = categoryService.getCategoryById(id);
-//		if(ObjectUtils.isEmpty(categoryDto)) 
-//		{
-//			return new ResponseEntity<>("Category not found with ID: " + id, HttpStatus.NOT_FOUND);
-//		}
-//		return new ResponseEntity<>(categoryDto, HttpStatus.OK);
-//-------------------------------------------------------------------------------------------------------------	
-		
-//		try
-//		{
-//			CategoryDto categoryDtoById = categoryService.getCategoryById(id); 
-//			if(ObjectUtils.isEmpty(categoryDtoById)) 
-//			{
-//				return new ResponseEntity<>("category Not found with ID: " + id, HttpStatus.NOT_FOUND);
-//			}
-//			return new ResponseEntity<>(categoryDtoById, HttpStatus.OK);
-//		}
-//		catch(ResourceNotFoundException e)
-//		{
-//			log.error("CategoryController :: getCategoryDetailById :: ", e.getMessage());
-//			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-//		}
-//		catch (Exception e) 
-//		{
-//			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-//		}
-//--------------------------------------------------------------------------------------------------------------
-		
-		CategoryDto categoryDtoById = categoryService.getCategoryById(id); 
-		if(ObjectUtils.isEmpty(categoryDtoById)) 
-		{
-			return new ResponseEntity<>("Internal Server Error", HttpStatus.NOT_FOUND);
-		}
-		return new ResponseEntity<>(categoryDtoById, HttpStatus.OK);
-		
-		
+	    CategoryDto categoryById = categoryService.getCategoryById(id);
+
+	    ApiResponse<CategoryDto> response =
+	    		new ApiResponse<>(true, "Category Get successfully with id : " + id, categoryById);
+	    return ResponseEntity
+		        .status(HttpStatus.OK)
+		        .contentType(MediaType.APPLICATION_JSON)
+		        .body(response);
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?> deleteCategoryById(@PathVariable Integer id){
-		Boolean deleteCategoryById = categoryService.deleteCategoryById(id);
-		if(ObjectUtils.isEmpty(deleteCategoryById))
-		{
-			return new ResponseEntity<>("Category Not Deleted", HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		return new ResponseEntity<>("Category Partially Deleted Successfully id: "+id, HttpStatus.OK);
-		
-		
-//		Boolean deleteById = categoryService.deleteCategoryById(id); 
-//		if(deleteById) {
-//			return new ResponseEntity<>("Category Deleted Successfully for this: " + id, HttpStatus.OK);
-//		}
-//		return new ResponseEntity<>("Category Not Deleted", HttpStatus.INTERNAL_SERVER_ERROR);
-//	}
+	public ResponseEntity<ApiResponse<Object>> deleteCategoryById(@PathVariable Integer id)
+	{
+	    CategoryDto deleteCategoryById = categoryService.deleteCategoryById(id);
+
+	    ApiResponse<Object> response =
+	            new ApiResponse<>(true, "Category deleted successfully with id : "+deleteCategoryById, null);
+
+	    return ResponseEntity
+		        .status(HttpStatus.OK)
+		        .contentType(MediaType.APPLICATION_JSON)
+		        .body(response);
 	}
+	
 }

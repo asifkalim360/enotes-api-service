@@ -1,6 +1,5 @@
 package com.project.services.impl;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,31 +27,19 @@ public class CategoryServiceImpl implements CategoryService {
 	
 	// CREATE CATEGORY:	
 	@Override
-	public Boolean saveCategory(CategoryDto categoryDto) {
-		
-//		Category category = new Category(); 
-//		category.setName(categoryDto.getName());
-//		category.setDescription(categoryDto.getDescription()); 
-//		category.setIsActive(categoryDto.getIsActive());
+	public CategoryDto saveCategory(CategoryDto categoryDto) {
 		
 		Category category = mapper.map(categoryDto, Category.class);
 		if(ObjectUtils.isEmpty(category.getId()))
 		{
 			category.setIsDeleted(false);
-//			category.setCreatedBy(1);
-//			category.setCreatedOn(new Date());
 		}
 		else 
 		{
 			updateCategory(category);
 		}
-
-		Category saveCategory = categoryRepository.save(category);
-		if(ObjectUtils.isEmpty(saveCategory))
-		{
-			return false;
-		}	
-		return true;
+		Category saveCategory = categoryRepository.save(category);	
+		return mapper.map(saveCategory, CategoryDto.class);
 	}	
 
 	private void updateCategory(Category category) {
@@ -63,9 +50,6 @@ public class CategoryServiceImpl implements CategoryService {
 			category.setCreatedBy(existCategory.getCreatedBy()); 
 			category.setCreatedOn(existCategory.getCreatedOn());
 			category.setIsDeleted(existCategory.getIsDeleted());
-		
-//			category.setUpdatedBy(1);
-//			category.setUpdatedOn(new Date());
 		}
 	}
 	
@@ -90,37 +74,29 @@ public class CategoryServiceImpl implements CategoryService {
 
 	// GET CATEGORY	BY ID:
 	@Override
-	public CategoryDto getCategoryById(Integer id) throws Exception {
+	public CategoryDto getCategoryById(Integer id) {
 		
-//		Optional<Category> findByCategory = categoryRepository.findById(id);
-//		if(findByCategory.isPresent())
-//		{
-//			Category category = findByCategory.get(); 
-//			return mapper.map(category, CategoryDto.class);
-//		}
-//		return null;
-//------------------------------------------------------------------------------------------------------
-		
-		Category category = categoryRepository.findByIdAndIsDeletedFalse(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Category Not Found with id: " + id));
-		if(!ObjectUtils.isEmpty(category)) {
-			category.getName().toUpperCase();
-			return mapper.map(category, CategoryDto.class);
-		}
-		return null;
+		Category category = categoryRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Category", "id", id));
+				return mapper.map(category, CategoryDto.class);
 	}
 
 	// DETELE CATEGORY BY ID:
 	@Override
-	public Boolean deleteCategoryById(Integer id) {
-		Optional<Category> findByIdCategory = categoryRepository.findById(id);
-		if(findByIdCategory.isPresent()) {
-			Category category = findByIdCategory.get(); 
-			category.setIsDeleted(true); 
-			categoryRepository.save(category); 
-			return true;
-		}
-		return false;
+	public CategoryDto deleteCategoryById(Integer id) {
+
+	    Category category = categoryRepository
+	            .findByIdAndIsDeletedFalse(id)
+	            .orElseThrow(() ->
+	                    new ResourceNotFoundException("Category", "id", id)
+	            );
+
+	    // 🔥 actual soft delete
+	    category.setIsDeleted(true);
+	    // Then save all category in DB.
+	    Category deletedCategory = categoryRepository.save(category);
+
+	    return mapper.map(deletedCategory, CategoryDto.class);
 	}
 
 	
